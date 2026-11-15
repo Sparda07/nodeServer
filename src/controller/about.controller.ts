@@ -3,6 +3,7 @@ import { aboutService } from "../service/about.service";
 import type { Iproduct } from "../types/product";
 import { bodyparser } from "../utils/parseBody";
 import { createProduct } from "../service/about.service";
+import { sendResponse } from "../utils/sendResponse";
 
 const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
 
@@ -31,24 +32,18 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
 
         const products = aboutService();
         
-        res.writeHead(200,
-            {"Content-Type": "application/json"});
-            res.end(JSON.stringify({"message": "Products fetched successfully", data: products}));
+        sendResponse(res, true, 200, "Products fetched successfully", products);
 
     } else if (method === "GET" && id !== null) {
         const products = aboutService();
         const product = products.find((p: Iproduct) => p.id === id);
 
         if (!product) {
-            res.writeHead(404,
-                {"Content-Type": "application/json"});
-                res.end(JSON.stringify({"message": "Product not found"}));
-                return;
+            sendResponse(res, false, 404, "Product not found");
+            return;
         }
 
-        res.writeHead(200,
-            {"Content-Type": "application/json"});
-            res.end(JSON.stringify({"message": "Products fetched successfully", data: product}));
+        sendResponse(res, true, 200, "Products fetched successfully", product);
 
     } else if (method === "POST" && url === "/about") {
 
@@ -66,11 +61,7 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
 
         createProduct(products);
 
-        res.writeHead(201,
-            {"Content-Type": "application/json"});
-            res.end(JSON.stringify({"message": "Products Created successfully", 
-                data: newProduct
-            }));
+        sendResponse(res, true, 201, "Products Created successfully", newProduct);
     }else if (method === "PUT" && id !== null) {
         const body = await bodyparser(req);
         const products = aboutService();
@@ -78,10 +69,8 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
         const index = products.findIndex((p: Iproduct) => p.id === id);
         // console.log(index);
         if (index <0) {
-            res.writeHead(404,
-                {"Content-Type": "application/json"});
-                res.end(JSON.stringify({"message": "Product not found"}));
-                return;
+            sendResponse(res, false, 404, "Product not found");
+            return;
         }
 
         products[index] = {
@@ -89,11 +78,9 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
             ...body
         };
         createProduct(products);
-        res.writeHead(200,
-            {"Content-Type": "application/json"});
-            res.end(JSON.stringify({"message": "Products updated successfully", 
-                data: products[index]
-            }));
+        sendResponse(res, true, 200, "Products updated successfully", products[index]);
+
+
     } else if (method === "DELETE" && id !== null) {
         const products = aboutService();
         const index = products.findIndex((p: Iproduct) => p.id === id);
@@ -105,9 +92,7 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
         }
         products.splice(index, 1);
         createProduct(products);
-        res.writeHead(200,
-            {"Content-Type": "application/json"});
-            res.end(JSON.stringify({"message": "Products deleted successfully"}));
+        sendResponse(res, true, 200, "Products deleted successfully");
     }
 
 
