@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse } from "http";
 import { aboutService } from "../service/about.service";
 import type { Iproduct } from "../types/product";
 import { bodyparser } from "../utils/parseBody";
+import { createProduct } from "../service/about.service";
 
 const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
 
@@ -35,8 +36,8 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
             res.end(JSON.stringify({"message": "Products fetched successfully", data: products}));
 
     } else if (method === "GET" && id !== null) {
-         const products = aboutService();
-         const product = products.find((p: Iproduct) => p.id === id);
+        const products = aboutService();
+        const product = products.find((p: Iproduct) => p.id === id);
 
         res.writeHead(200,
             {"Content-Type": "application/json"});
@@ -45,12 +46,23 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
     } else if (method === "POST" && url === "/about") {
 
         const body = await bodyparser(req);
-        console.log(body);
+        // console.log(body);
+
+        const newProduct = {
+            id : Date.now(),
+            ...body
+        }
+
+        // console.log(newProduct);
+        const products = aboutService();
+        products.push(newProduct);
+
+        createProduct(products);
 
         res.writeHead(201,
             {"Content-Type": "application/json"});
             res.end(JSON.stringify({"message": "Products Created successfully", 
-                // data: product
+                data: newProduct
             }));
     }
 
