@@ -1,8 +1,9 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { aboutService } from "../service/about.service";
 import type { Iproduct } from "../types/product";
+import { bodyparser } from "../utils/parseBody";
 
-const aboutController = (req: IncomingMessage, res: ServerResponse) => {
+const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
 
 
     const url = req.url;
@@ -41,6 +42,16 @@ const aboutController = (req: IncomingMessage, res: ServerResponse) => {
             {"Content-Type": "application/json"});
             res.end(JSON.stringify({"message": "Products fetched successfully", data: product}));
 
+    } else if (method === "POST" && url === "/about") {
+
+        const body = await bodyparser(req);
+        console.log(body);
+
+        res.writeHead(201,
+            {"Content-Type": "application/json"});
+            res.end(JSON.stringify({"message": "Products Created successfully", 
+                // data: product
+            }));
     }
 
 
