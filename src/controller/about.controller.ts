@@ -24,15 +24,17 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
 
     if( url === "/about" && method === "GET") {
 
-        // const products = [
-        //     {id: 1, name: "Product 1", price: 10},
-        //     {id: 2, name: "Product 2", price: 20},
-        //     {id: 3, name: "Product 3", price: 30}
-        // ]
 
         const products = aboutService();
+
+        try {
+                    sendResponse(res, true, 200, "Products fetched successfully", products);
+        }
+        catch (error) {
+            sendResponse(res, false, 500, "Internal Server Error");
+        }
         
-        sendResponse(res, true, 200, "Products fetched successfully", products);
+
 
     } else if (method === "GET" && id !== null) {
         const products = aboutService();
@@ -43,7 +45,12 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
             return;
         }
 
-        sendResponse(res, true, 200, "Products fetched successfully", product);
+        try {
+            sendResponse(res, true, 200, "Product fetched successfully", product);
+        }
+        catch (error) {
+            sendResponse(res, false, 500, "Internal Server Error");
+        }
 
     } else if (method === "POST" && url === "/about") {
 
@@ -61,7 +68,15 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
 
         createProduct(products);
 
-        sendResponse(res, true, 201, "Products Created successfully", newProduct);
+        try {
+            sendResponse(res, true, 201, "Product created successfully", newProduct);
+        }
+        catch (error) {
+            sendResponse(res, false, 500, "Internal Server Error");
+        }
+
+
+
     }else if (method === "PUT" && id !== null) {
         const body = await bodyparser(req);
         const products = aboutService();
@@ -69,7 +84,12 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
         const index = products.findIndex((p: Iproduct) => p.id === id);
         // console.log(index);
         if (index <0) {
-            sendResponse(res, false, 404, "Product not found");
+            try {
+                sendResponse(res, false, 404, "Product not found");
+            }
+            catch (error) {
+                sendResponse(res, false, 500, "Internal Server Error");
+            }
             return;
         }
 
@@ -78,7 +98,12 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
             ...body
         };
         createProduct(products);
-        sendResponse(res, true, 200, "Products updated successfully", products[index]);
+        try {
+            sendResponse(res, true, 200, "Product updated successfully", products[index]);
+        }
+        catch (error) {
+            sendResponse(res, false, 500, "Internal Server Error");
+        }
 
 
     } else if (method === "DELETE" && id !== null) {
