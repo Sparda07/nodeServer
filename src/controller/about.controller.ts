@@ -64,6 +64,29 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
             res.end(JSON.stringify({"message": "Products Created successfully", 
                 data: newProduct
             }));
+    }else if (method === "PUT" && id !== null) {
+        const body = await bodyparser(req);
+        const products = aboutService();
+
+        const index = products.findIndex((p: Iproduct) => p.id === id);
+        // console.log(index);
+        if (index <0) {
+            res.writeHead(404,
+                {"Content-Type": "application/json"});
+                res.end(JSON.stringify({"message": "Product not found"}));
+                return;
+        }
+
+        products[index] = {
+            ...products[index],
+            ...body
+        };
+        createProduct(products);
+        res.writeHead(200,
+            {"Content-Type": "application/json"});
+            res.end(JSON.stringify({"message": "Products updated successfully", 
+                data: products[index]
+            }));
     }
 
 
