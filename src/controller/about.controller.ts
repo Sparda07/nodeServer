@@ -39,6 +39,13 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
         const products = aboutService();
         const product = products.find((p: Iproduct) => p.id === id);
 
+        if (!product) {
+            res.writeHead(404,
+                {"Content-Type": "application/json"});
+                res.end(JSON.stringify({"message": "Product not found"}));
+                return;
+        }
+
         res.writeHead(200,
             {"Content-Type": "application/json"});
             res.end(JSON.stringify({"message": "Products fetched successfully", data: product}));
