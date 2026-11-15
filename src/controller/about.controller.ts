@@ -87,6 +87,20 @@ const aboutController = async (req: IncomingMessage, res: ServerResponse) => {
             res.end(JSON.stringify({"message": "Products updated successfully", 
                 data: products[index]
             }));
+    } else if (method === "DELETE" && id !== null) {
+        const products = aboutService();
+        const index = products.findIndex((p: Iproduct) => p.id === id);
+        if (index < 0) {
+            res.writeHead(404,
+                {"Content-Type": "application/json"});
+                res.end(JSON.stringify({"message": "Product not found"}));
+                return;
+        }
+        products.splice(index, 1);
+        createProduct(products);
+        res.writeHead(200,
+            {"Content-Type": "application/json"});
+            res.end(JSON.stringify({"message": "Products deleted successfully"}));
     }
 
 
